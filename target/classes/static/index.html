@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>生年月日送信フォーム</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400&family=Zen+Kurenaido&display=swap" rel="stylesheet" />
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+
+  <div id="leaves-container" style="pointer-events: none; position: fixed; inset: 0; z-index: 0;"></div>
+
+  <div class="card">
+
+    <h1><span class="shichu">四柱推命</span></h1>
+
+    <label>生年月日</label>
+    <div class="birthday-select-container" style="display: flex; gap: 10px; margin-bottom: 20px;">
+      <select id="year" style="flex: 1; padding: 10px; border-radius: 5px; background: #222; color: #fff; border: 1px solid #444;"></select>
+      <select id="month" style="width: 80px; padding: 10px; border-radius: 5px; background: #222; color: #fff; border: 1px solid #444;"></select>
+      <select id="day" style="width: 80px; padding: 10px; border-radius: 5px; background: #222; color: #fff; border: 1px solid #444;"></select>
+    </div>
+
+    <button id="sendBtn">
+      <span>データを送信する</span>
+    </button>
+
+    <div id="loading" class="hidden">
+      <div class="spinner"></div>
+      <p style="font-size: 12px; color: #aaa; margin-top: 5px;">星の配置を計算中...</p>
+    </div>
+
+    <div id="result"></div>
+
+  </div>
+  
+
+  <script>
+	  document.addEventListener('DOMContentLoaded', () => {
+	    // 💡 キャッシュ対策：URLの末尾にランダムな数値を付けて、常に「最新のファイル」を読み込ませます
+	    const cacheBuster = '?v=' + new Date().getTime();
+	    const audioPath = '/mp3/forest.mp3' + cacheBuster;
+	    
+	    // 音声オブジェクトを作成し、ループ再生を有効にする
+	    const audio = new Audio(audioPath);
+	    audio.loop = true;
+	
+	    console.log('index.html が開かれました。最新の BGM 再生を試みます...');
+	
+	    // 1. 画面が開いた瞬間に再生を実行
+	    audio.play()
+	      .then(() => {
+	        console.log('BGMの自動再生に成功しました！');
+	      })
+	      .catch(error => {
+	        // 2. ブラウザの制限（自動再生ポリシー）でブロックされた場合のバックアップ
+	        console.log('ブラウザの制限により自動再生がブロックされました。クリックを待ちます。');
+	        
+	        // 画面のどこかを1回でもクリックしたら、確実に音が鳴り始めるようにする
+	        const playBGM = () => {
+	          audio.play().then(() => {
+	            console.log('ユーザーの操作によりBGMが開始されました。');
+	            document.removeEventListener('click', playBGM);
+	          });
+	        };
+	        
+	        document.addEventListener('click', playBGM);
+	      });
+
+	    // ==========================================
+	    // 👇 【変更箇所】マウスが乗った時に音を鳴らす
+	    // ==========================================
+	    const sendButton = document.getElementById('sendBtn');
+	    
+	    if (sendButton) {
+	      const sePath = '/mp3/horror_s.mp3' + cacheBuster;
+	      const clickSE = new Audio(sePath);
+	
+	      // 'click' から 'mouseenter'（マウスが乗った時）に変更
+	      sendButton.addEventListener('mouseenter', () => {
+	        clickSE.currentTime = 0; 
+	        clickSE.play()
+	          .then(() => {
+	            console.log('マウスが乗ったので怪しい音（horror_s.mp3）を再生しました。');
+	          })
+	          .catch(error => {
+	            console.error('効果音の再生に失敗しました:', error);
+	          });
+	      });
+	    }
+	    // ==========================================
+
+	  });
+</script>
+
+
+</body>
+</html>

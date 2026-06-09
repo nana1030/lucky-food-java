@@ -1,0 +1,57 @@
+
+
+/* ===== 全体の背景と配置 ===== */
+body {
+  background:
+    linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
+    url("/images/lunch_bg.png") center center / cover no-repeat;
+  background-attachment: fixed;
+  position: relative;
+  height:100vh
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.lunch_text {
+	font-family: 'Noto Serif JP', serif;
+}
+
+h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 32px;
+  text-shadow: 0 0 10px rgba(255,255,255,0.8);
+}
+
+.sub-title {
+  font-size: 42px;
+  color: white;
+  margin-bottom: 30px;
+  text-align: center;
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.8),
+    0 0 20px rgba(255,255,200,0.4);
+  animation: fadeUp 1s ease forwards;
+}
+
+/* 768px以下のときに適用されるスタイル */
+ @media (max-width: 768px) {
+ 
+  
+   .back-btn {
+   		max-width: 80%;
+   }
+   
+   .back-btn2 {
+   		max-width: 80%;
+   }
+
+	  
+ }
+
+
+

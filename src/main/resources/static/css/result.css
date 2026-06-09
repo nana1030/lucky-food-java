@@ -1,0 +1,191 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d0f14;
+  --surface: #161a23;
+  --border: #2a2f3d;
+  --accent: #7ee8a2;
+  --accent2: #56c8e8;
+  --text: #e8ecf4;
+  --muted: #6b7280;
+  --radius: 12px;
+}
+
+body {
+  background: radial-gradient(circle at top, #0d1b1e, #05070a 60%, #020304);
+  background-image: url("/images/forest.png");
+  background-size: cover;
+  background-position: center;
+  color: var(--text);
+  font-family: 'Zen Kurenaido', serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  animation: rise .6s cubic-bezier(.22,1,.36,1) both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.label {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.main-title {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 300;
+  font-size: 28px;
+  letter-spacing: 0.15em;
+  margin-bottom: 32px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.6);
+  position: relative;
+  margin-bottom: 24px;
+}
+
+/* カード上部のラインアクセント */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+}
+
+.result-item {
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.result-item:last-child {
+  margin-bottom: 0;
+}
+
+.result-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 6px;
+}
+
+.result-value {
+  font-size: 20px;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+
+.result-value.accent {
+  color: var(--accent);
+  font-size: 24px;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 20px 0;
+}
+
+.back-btn {
+  width: 100%;
+  padding: 15px;
+  background: #161a23;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  font-family: 'Zen Kurenaido', serif;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: color .2s, background .2s;
+}
+
+.back-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent), var(--accent2));
+  background-size: 300% 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .3s ease;
+  z-index: 0;
+}
+
+.back-btn:hover::after {
+  transform: scaleX(1);
+  animation: wave 1.5s linear infinite;
+}
+
+.back-btn:hover {
+  color: #161a23;
+}
+
+.back-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+/* 光の粒子 */
+.light-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  width: 8px; height: 8px;
+  background: radial-gradient(circle, rgba(255,255,200,1), rgba(126,232,162,0.3));
+  border-radius: 50%;
+  box-shadow: 0 0 10px 4px rgba(200,255,180,0.6);
+  animation: floatUp 4s ease-out forwards;
+}
+
+@keyframes floatUp {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  50%  { transform: translate(var(--tx), var(--ty)) scale(1.3); opacity: 0.8; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0.2); opacity: 0; }
+}
+.result-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-family: 'Zen Kurenaido', serif;
+  margin-bottom: 6px;
+}
+@keyframes wave {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* 768px以下のときに適用されるスタイル */
+ @media (max-width: 768px) {
+ 
+	   .container{
+	   		max-width :600px;
+	   }
+	  
+ }

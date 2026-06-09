@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ラッキーフード</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Zen+Kurenaido&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/css/lucky.css">
+  <script src="/js/lucky.js" defer></script>
+</head>
+
+<body>
+
+ <div class="container">
+
+    <h1 class="lucky-title">あなたのラッキーフード</h1>
+    
+    <div class="food_all" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px;">
+	    
+	    <h2 th:text="${elementName}" style="width: 100%; text-align: center;">属性名</h2>
+	
+	    <div class="food-item" th:each="item : ${fortuneList}" style="text-align: center;">
+	        
+	        <img th:if="${item.element == '木'}" th:src="@{|/images/moku/${item.imageName}|}" th:alt="${item.element}">
+	        
+	        <img th:if="${item.element == '水'}" th:src="@{|/images/mizu/${item.imageName}|}" th:alt="${item.element}">
+	        
+	        <img th:if="${item.element == '火'}" th:src="@{|/images/hi/${item.imageName}|}" th:alt="${item.element}">
+	        
+	        <img th:if="${item.element == '金'}" th:src="@{|/images/kin/${item.imageName}|}" th:alt="${item.element}">
+	        
+	        <img th:if="${item.element == '土'}" th:src="@{|/images/tsuchi/${item.imageName}|}" th:alt="${item.element}">
+	        
+	    </div>
+	    
+	</div>
+    
+    <div class="food_box">
+        <button class="back-btn" onclick="window.location.href='element.html'">
+            あなたと相性抜群な人は・・・
+        </button>
+        
+        <button class="back-btn2" onclick="window.location.href='lunch.html'">
+            近くのごはん屋さんを探す
+        </button>
+    </div>
+
+</div>
+
+
+  
+ <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // =========================================================
+      // 1. 相性ルールマップの定義とパラメータ受け取り
+      // =========================================================
+      const compatMap = {
+        '火': '木',   // element=火 の時は 木 の画像を表示
+        '土': '火',   // element=土 の時は 火 の画像を表示
+        '金': '土',   // element=金 の時は 土 の画像を表示
+        '水': '金',   // element=水 の時は 金 の画像を表示
+        '木': '水'    // element=木 の時は 水 の画像を表示
+      };
+
+      // Java（Controller）経由でURLパラメータの値を受け取る
+      const myElement = /*[[${myElement}]]*/ '木';
+      console.log('★届いたパラメータ:', myElement);
+      
+      const targetElement = compatMap[myElement];
+      console.log('★表示する画像の五行:', targetElement);
+
+      // =========================================================
+      // 2. 対象フードの絞り込みとランダムシャッフル
+      // =========================================================
+      const allFoodItems = Array.from(document.querySelectorAll('.food-item'));
+
+      // 表示すべき五行に一致するフードだけを抽出
+      const matchedFoods = allFoodItems.filter(item => {
+          return item.getAttribute('data-element') === targetElement;
+      });
+
+      // 配列をランダムにシャッフル
+      for (let i = matchedFoods.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [matchedFoods[i], matchedFoods[j]] = [matchedFoods[j], matchedFoods[i]];
+      }
+
+      // =========================================================
+      // 3. 先頭の最大3件を表示状態にし、順番にフェードインさせる
+      // =========================================================
+      const displayCount = Math.min(3, matchedFoods.length);
+      
+      for (let i = 0; i < displayCount; i++) {
+        const divItem = matchedFoods[i];
+        
+        // まず親のdivを表示状態にする（中身のimgはCSSでopacity:0なのでまだ透明）
+        divItem.style.display = 'inline-block'; 
+        
+        // 親divの中にあるimgタグをピンポイントで取得
+        const img = divItem.querySelector('img');
+        if (img) {
+          // i * 300ミリ秒ずつタイミングを遅らせて「show」クラスを付与
+          setTimeout(() => {
+            img.classList.add('show');
+            console.log(`${i + 1}枚目の画像をフェードインしました。`);
+          }, i * 300);
+        }
+      }
+
+      // =========================================================
+      // 4. ページが開いた瞬間に kirakira.mp3 を1回だけ鳴らす処理
+      // =========================================================
+      const pageOpenAudio = new Audio('/mp3/kirakira.mp3?v=' + new Date().getTime());
+      console.log('lucky.html が開かれました。演出音(1回)の再生を開始します...');
+
+      pageOpenAudio.play()
+          .then(() => {
+              console.log('演出音の自動再生に成功しました！');
+          })
+          .catch(error => {
+              console.log('ブラウザの自動再生制限を検知。ユーザーの画面操作を待ちます。');
+              
+              const playOnce = () => {
+                  pageOpenAudio.play().then(() => {
+                      console.log('ユーザー操作により、演出音が1回再生されました。');
+                      document.removeEventListener('click', playOnce);
+                  });
+              };
+              document.addEventListener('click', playOnce);
+          });
+
+    });
+    
+ 	// 🌟 3つのラッキーフード画像を順番にフェードインさせる制御
+    const foodImages = document.querySelectorAll('.food-item img');
+
+    if (foodImages.length > 0) {
+        // 1枚目、2枚目、3枚目を時間差（500ミリ秒 ＝ 0.5秒おき）で順番に表示させる
+        foodImages.forEach((img, index) => {
+            setTimeout(() => {
+                img.classList.add('show');
+            }, index * 500); // 0秒後（1枚目）、0.5秒後（2枚目）、1.0秒後（3枚目）
+        });
+    }
+    
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>相性占い</title>
+  <link rel="stylesheet" href="/css/element.css">
+</head>
+
+<body>
+
+  <div class = "moon_please">
+ 
+	  <p class = "moonright">
+	  
+	  	<a href = "moon.html">
+	  		<img src = "/images/moon_img.png" alt = "月" >
+	  	</a>
+	  	
+	  </p>
+	  
+	  <p class = "moon_mini_text">月に祈る</p>
+	  
+  </div>
+
+  <div class="container">
+    <h2 class="sub-title">あなたと相性抜群なのは</h2>
+
+    <div class="characters">
+
+      <div class="character-box">
+        <img id="myCharaImg" src="" alt="">
+        <p id="myCharaLabel" class="chara-label"></p>
+      </div>
+
+      <div class="heart-label">❤</div>
+
+      <div class="character-box">
+        <img id="compatCharaImg" src="" alt="">
+        <p id="compatCharaLabel" class="chara-label"></p>
+      </div>
+
+    </div>
+  </div>
+
+  <button class="retry-btn" onclick="window.location.href='index.html'">
+  ←もう一度診断する
+</button>
+
+<button class="chatbot-btn" onclick="window.location.href='/lucky/chatbot'">
+  <span>
+    AI占い師に<br>
+    相談する
+  </span>
+</button>
+
+ <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ==========================================================
+  // 🔮 1. ブラウザの秘密のメモ帳から五行を読み取る
+  // ==========================================================
+  // result.htmlで保存した文字をここで取り出します（無ければ木にする）
+  let myElement = sessionStorage.getItem('myElement') || '木';
+  console.log('★ブラウザの記憶から五行の読み込みに成功しました！➔', myElement);
+
+  // 各属性の画像パス一覧
+  const elementImages = {
+    '木': '/images/element_ki_character.png',
+    '火': '/images/element_hi_character.png',
+    '土': '/images/element_tsuchi_character.png',
+    '金': '/images/element_kin_character.png',
+    '水': '/images/element_mizu_character.png',
+  };
+
+  // 💡 あなたが指定してくれた「自分」と「相手」の特別な組み合わせルール
+  const combinationMap = {
+    '木': { my: '木', compat: '水' }, // 木の時：自分は木、相手は水
+    '火': { my: '火', compat: '木' }, // 火の時：自分は木、相手は木
+    '土': { my: '土', compat: '火' }, // 土の時：自分は土、相手は火
+    '金': { my: '金', compat: '土' }, // 金の時：自分は金、相手は土
+    '水': { my: '水', compat: '金' }  // 水の時：自分は水、相手は金
+  };
+
+  // 今回の組み合わせデータを取得
+  const currentSetup = combinationMap[myElement] || combinationMap['木'];
+
+  // 画面の「自分（あなた）」の画像と文字を書き換える
+  const myImg = document.getElementById('myCharaImg');
+  const myLabel = document.getElementById('myCharaLabel');
+  if (myImg) {
+    myImg.src = elementImages[currentSetup.my];
+    myImg.alt = currentSetup.my + 'のキャラクター';
+  }
+  if (myLabel) {
+    myLabel.textContent = 'あなた（' + currentSetup.my + '）';
+  }
+
+  // 画面の「相手」の画像と文字を書き換える
+  const compatImg = document.getElementById('compatCharaImg');
+  const compatLabel = document.getElementById('compatCharaLabel');
+  if (compatImg) {
+    compatImg.src = elementImages[currentSetup.compat];
+    compatImg.alt = currentSetup.compat + 'のキャラクター';
+  }
+  if (compatLabel) {
+    compatLabel.textContent = '相手（' + currentSetup.compat + '）';
+  }
+
+  // ==========================================
+  // ✨ 2. 魔法のエフェクト（オーラ・キラキラ）
+  // ==========================================
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes magicGlow {
+      0%   { opacity: 0;   transform: scale(0.2); }
+      30%  { opacity: 1;   transform: scale(1.2); }
+      100% { opacity: 0;   transform: scale(2.5); }
+    }
+    @keyframes auraGlow {
+      0%,100% { opacity: 0; }
+      50%      { opacity: 1; }
+    }
+    .character-box {
+      position: relative;
+    }
+  `;
+  document.head.appendChild(style);
+
+  function createMagicDot(x, y) {
+    const el = document.createElement('div');
+    const size = 8 + Math.random() * 10;
+    const duration = 1.2 + Math.random() * 0.8;
+    const colors = ['#FFD700', '#FFE566', '#FFFACD', '#FFC200', '#ffffff'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+
+    el.style.cssText = `
+      position: fixed;
+      left: ${x - size / 2}px;
+      top:  ${y - size / 2}px;
+      width: ${size}px;
+      height: ${size}px;
+      border-radius: 50%;
+      background: radial-gradient(circle, ${color} 0%, transparent 70%);
+      box-shadow: 0 0 ${size}px ${color}, 0 0 ${size * 2}px ${color}88;
+      pointer-events: none;
+      z-index: 999;
+      animation: magicGlow ${duration}s ease-out forwards;
+    `;
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+
+  function createAura(element) {
+    const img = element.querySelector('img');
+    const rect = (img && img.getBoundingClientRect().height > 0)
+      ? img.getBoundingClientRect()
+      : element.getBoundingClientRect();
+
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const aura = document.createElement('div');
+    aura.style.cssText = `
+      position: fixed;
+      left: ${rect.left - 10}px;
+      top:  ${rect.top  - 10}px;
+      width:  ${rect.width  + 20}px;
+      height: ${rect.height + 20}px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,215,0,0.35) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 998;
+      animation: auraGlow 1.2s ease-in-out forwards;
+    `;
+    document.body.appendChild(aura);
+    aura.addEventListener('animationend', () => aura.remove());
+
+    const count = 10;
+    for (let i = 0; i < count; i++) {
+      const angle  = Math.random() * Math.PI * 2;
+      const radius = (rect.width * 0.3) + Math.random() * (rect.width * 0.25);
+      const x = rect.left + rect.width  / 2 + Math.cos(angle) * radius;
+      const y = rect.top  + rect.height / 2 + Math.sin(angle) * radius * 0.7;
+      const clampedY = Math.min(y, rect.bottom - 5);
+      setTimeout(() => createMagicDot(x, clampedY), i * 80);
+    }
+  }
+
+  const boxes = document.querySelectorAll('.character-box');
+  
+  setInterval(() => {
+    boxes.forEach(box => createAura(box));
+  }, 3000);
+
+  setTimeout(() => {
+    boxes.forEach(box => createAura(box));
+  }, 800);
+
+});
+</script>
+  
+  <script>
+	  document.addEventListener('DOMContentLoaded', () => {
+	    // 💡 キャッシュ対策：URLの末尾にランダムな数値を付けて、常に「最新のファイル」を読み込ませます
+	    const cacheBuster = '?v=' + new Date().getTime();
+	    const audioPath = '/mp3/hoshi.mp3' + cacheBuster;
+	    
+	    // 音声オブジェクトを作成し、ループ再生を有効にする
+	    const audio = new Audio(audioPath);
+	    audio.loop = true;
+	
+	    console.log('element.html が開かれました。最新の BGM 再生を試みます...');
+	
+	    // 1. 画面が開いた瞬間に再生を実行
+	    audio.play()
+	      .then(() => {
+	        console.log('BGMの自動再生に成功しました！');
+	      })
+	      .catch(error => {
+	        // 2. ブラウザの制限（自動再生ポリシー）でブロックされた場合のバックアップ
+	        console.log('ブラウザの制限により自動再生がブロックされました。クリックを待ちます。');
+	        
+	        // 画面のどこかを1回でもクリックしたら、確実に音が鳴り始めるようにする
+	        const playBGM = () => {
+	          audio.play().then(() => {
+	            console.log('ユーザーの操作によりBGMが開始されました。');
+	            document.removeEventListener('click', playBGM);
+	          });
+	        };
+	        
+	        document.addEventListener('click', playBGM);
+	      });
+	  });
+   </script>
+   
+   <script>
+	  // DOMContentLoadedイベントを使って、HTMLの読み込みが終わってから実行します
+	  window.addEventListener('DOMContentLoaded', () => {
+	    // クラス名「.moon_please」の要素を取得
+	    const moon = document.querySelector('.moonright');
+	
+	    // 要素が無事に見つかった場合のみ処理を実行（エラー防止）
+	    if (moon) {
+	      // 1. ページ読み込み時に自動で回転を開始
+	      moon.classList.add('spinning');
+	
+	      // 2. 月をクリックしたときに回転・停止を切り替える設定
+	      moon.addEventListener('click', () => {
+	        moon.classList.toggle('spinning');
+	      });
+	    }
+	  });
+	</script>
+
+</body>
+</html>

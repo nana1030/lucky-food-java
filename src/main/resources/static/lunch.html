@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>近くのごはん屋さん検索</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Zen+Kurenaido&display=swap" rel="stylesheet" />
+  	<link rel="stylesheet" href="/css/lunch.css">
+    <style>
+        body { font-family: sans-serif; padding: 20px; text-align: center; background-color: #fafafa; }
+        .container { max-width: 600px; margin: 0 auto;  background: #ffffff85; padding: 30px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        button { 
+  bottom: 5%;
+  left: 45%;
+  
+
+  padding: 14px 28px;
+
+  background: linear-gradient(135deg, #ffffff, #fff8dc);
+  border: 2px solid gold;
+  border-radius: 12px;
+
+  color: #b8860b;
+
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 0 10px rgba(255, 215, 0, 0.4),
+    0 0 20px rgba(255, 255, 200, 0.3);
+
+  transition: 0.3s;}
+        button:hover { background-color: #ff4747; }
+        #result { margin-top: 25px; text-align: left; }
+        .shop { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .shop:last-child { border-bottom: none; }
+        .shop h3 a { color: #7ee8a2; text-decoration: none; text-shadow: 2px 2px 2px #33333342;}
+        .shop h3 a:hover { text-decoration: underline; }
+        
+        @media (max-width: 768px) {
+ 
+		  	h1{
+		  		font-size: 28px;
+		  	}
+			  
+		 }
+        
+        
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>近くのごはん屋さん検索</h1>
+        <p class="lunch_text">ボタンを押すと、今いる場所の周辺にあるお店を提案します。</p>
+        <button onclick="getNearbyGourmet()">現在地から探す</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+    function getNearbyGourmet() {
+        if (!navigator.geolocation) {
+            alert("お使いのブラウザは位置情報に対応していません。");
+            return;
+        }
+
+        document.getElementById("result").innerHTML = "<p>⏳ 位置情報を取得中...</p>";
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                document.getElementById("result").innerHTML = "<p>🔍 周辺のお店を検索中...</p>";
+
+                // Javaのコントローラーへ緯度・経度を送信
+                fetch(`/api/gourmet?lat=${lat}&lng=${lng}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displayShops(data);
+                    })
+                    .catch(error => {
+                        console.error("エラー:", error);
+                        document.getElementById("result").innerHTML = "<p>❌ 検索中にエラーが発生しました。</p>";
+                    });
+            },
+            (error) => {
+                alert("位置情報の取得に失敗しました。ブラウザの位置情報許可を確認してください。");
+                document.getElementById("result").innerHTML = "";
+            }
+        );
+    }
+
+    // 画面にお店の一覧を表示する処理
+    function displayShops(data) {
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = "";
+
+        const shops = data.results.shop;
+
+        if (!shops || shops.length === 0) {
+            resultDiv.innerHTML = "<p>近くにお店が見つかりませんでした。</p>";
+            return;
+        }
+
+        shops.forEach(shop => {
+            const shopHtml = `
+                <div class="shop">
+                    <h3><a href="${shop.urls.pc}" target="_blank"> ${shop.name}</a></h3>
+                    <p><strong>ジャンル:</strong> ${shop.genre.name} / <strong>予算:</strong> ${shop.budget.name}</p>
+                    <p><strong>住所:</strong> ${shop.address}</p>
+                </div>
+            `;
+            resultDiv.insertAdjacentHTML('beforeend', shopHtml);
+        });
+    }
+    </script>
+</body>
+</html>

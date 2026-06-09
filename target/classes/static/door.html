@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>四柱推命 ラッキーフード</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #7ee8a2;
+      --muted:  rgba(232,236,244,0.5);
+    }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #050709;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* 扉の背景画像 → 最初から表示 */
+    .scene {
+      position: fixed; inset: 0;
+      background: url('/images/扉.png') center center / cover no-repeat;
+    }
+
+    /* 薄暗いオーバーレイ */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.35);
+      transition: opacity 0.6s ease;
+    }
+
+    /* グロー */
+    .glow {
+      position: fixed; pointer-events: none;
+      border-radius: 50%; filter: blur(50px);
+    }
+    .glow-tl {
+      top: -150px; left: -150px; width: 450px; height: 450px;
+      background: radial-gradient(circle, rgba(126,232,162,0.12), transparent 70%);
+      animation: pulse 4s ease-in-out infinite alternate;
+    }
+    .glow-br {
+      bottom: -150px; right: -150px; width: 450px; height: 450px;
+      background: radial-gradient(circle, rgba(86,200,232,0.09), transparent 70%);
+      animation: pulse 5s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes pulse { from { opacity:.6; } to { opacity:1.1; } }
+
+    /* ヒントテキスト */
+    .text-wrapper {
+      position: fixed; bottom: 11%; left: 50%;
+      transform: translateX(-50%);
+      text-align: center; z-index: 10;
+      animation: fadeUp 1.2s cubic-bezier(.22,1,.36,1) 0.4s both;
+      transition: opacity 0.3s;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateX(-50%) translateY(18px); }
+      to   { opacity:1; transform: translateX(-50%) translateY(0); }
+    }
+    .hint {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 8px;
+      color: var(--muted); font-family: 'DM Mono', monospace;
+      font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+      animation: breathe 2.5s ease-in-out infinite;
+    }
+    .hint-line {
+      width: 1px; height: 30px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+    }
+    @keyframes breathe {
+      0%,100% { opacity:.45; transform: translateY(0); }
+      50%      { opacity: 1;  transform: translateY(-5px); }
+    }
+
+    /* クリックしたらフェードアウトして遷移 */
+    body.opening .overlay      { opacity: 1; background: rgba(0,0,0,0.9); transition: opacity 1.2s ease; }
+    body.opening .text-wrapper { opacity: 0; }
+
+    /* フラッシュ */
+    .flash {
+      position: fixed; inset: 0;
+      background: rgba(200,255,220,0);
+      z-index: 30; pointer-events: none;
+      transition: background 0.15s ease;
+    }
+    body.flash-on .flash { background: rgba(200,255,220,0.28); }
+
+    /* 光の粒子 */
+    .particle {
+      position: fixed; pointer-events: none; z-index: 15;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,200,1), rgba(126,232,162,0.3));
+      box-shadow: 0 0 8px 3px rgba(200,255,180,0.5);
+      animation: floatUp 4.5s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0%   { opacity:1; transform: translate(0,0) scale(1); }
+      50%  { opacity:.7; transform: translate(var(--tx), var(--ty)) scale(1.4); }
+      100% { opacity:0;  transform: translate(var(--tx), calc(var(--ty) * 2)) scale(0.1); }
+    }
+    
+    @media (max-width: 768px) {
+ 
+	  	.scene {
+	  		left : -8%; 
+	  	}
+	  
+ 	}
+    
+    
+  </style>
+</head>
+<body>
+  <div class="scene"></div>
+  <div class="overlay"></div>
+  <div class="glow glow-tl"></div>
+  <div class="glow glow-br"></div>
+  <div class="flash" id="flash"></div>
+
+  <div class="text-wrapper">
+    <div class="hint">
+      <div class="hint-line"></div>
+      扉をクリックして入る
+    </div>
+  </div>
+  
+  
+
+  <script>
+    let opened = false;
+
+    function spawnParticle(x, y) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const angle = Math.random() * Math.PI * 2;
+      const dist  = 60 + Math.random() * 130;
+      p.style.left = x + 'px';
+      p.style.top  = y + 'px';
+      p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+      p.style.setProperty('--ty', (Math.sin(angle) * dist - 100) + 'px');
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 4600);
+    }
+
+    // マウス移動で粒子
+    document.body.addEventListener('mousemove', (e) => {
+      if (opened) return;
+      if (Math.random() > 0.93) spawnParticle(e.clientX, e.clientY);
+    });
+
+    // クリックで暗転 → 遷移
+    document.body.addEventListener('click', (e) => {
+      if (opened) return;
+      opened = true;
+
+      // 粒子バースト
+      for (let i = 0; i < 20; i++) {
+        setTimeout(() => spawnParticle(e.clientX, e.clientY), i * 28);
+      }
+
+      // フラッシュ
+      document.body.classList.add('flash-on');
+      setTimeout(() => document.body.classList.remove('flash-on'), 180);
+
+      // 暗転アニメーション開始
+      document.body.classList.add('opening');
+
+      // 1.3秒後にメインページへ
+      setTimeout(() => { window.location.href = '/index.html'; }, 1300);
+    });
+
+    // 背景に浮かぶ粒子
+    setInterval(() => {
+      if (opened) return;
+      spawnParticle(
+        Math.random() * window.innerWidth,
+        Math.random() * window.innerHeight
+      );
+    }, 900);
+  </script>
+  
+  <script>
+  
+  document.addEventListener('DOMContentLoaded', () => {
+	  const textWrapper = document.querySelector('.text-wrapper');
+	  
+	  // パスは前回の検証に合わせて適宜「/mp3/...」や「./mp3/...」に調整してください
+	  const audio = new Audio('./mp3/opendoor.mp3');
+
+	  if (textWrapper) {
+	    textWrapper.addEventListener('click', (event) => {
+	      // 1. まず通常のページ遷移（aタグの挙動など）を一時停止する
+	      event.preventDefault(); 
+	      
+	      console.log('.text-wrapper がクリックされました。音声を再生し、その後に遷移します。');
+
+	      // 2. 音声を再生
+	      audio.play()
+	        .then(() => {
+	          console.log('音声の再生を開始しました。');
+
+	          // 3. 【遷移のタイミング】
+	          // パターンA: 音が「完全に終わってから」遷移したい場合
+	          audio.addEventListener('ended', () => {
+	            goToNextPage();
+	          });
+
+	          // パターンB: 音が鳴ると同時に、余韻を残しつつ0.5秒後くらいにパッと遷移したい場合
+	          // （パターンBにしたい場合は、上のパターンAを消して、下の5行のコメントアウトを外してください）
+	          /*
+	          setTimeout(() => {
+	            goToNextPage();
+	          }, 500); // 500ミリ秒 = 0.5秒
+	          */
+	        })
+	        .catch(error => {
+	          console.error('音声の再生に失敗したため、すぐに遷移します。原因:', error);
+	          // 音が鳴らなくても画面がフリーズしないようにすぐ遷移させる
+	          goToNextPage();
+	        });
+	    });
+	  }
+
+	  // 次のページへ進む処理
+	  function goToNextPage() {
+	    // 💡ここに移動したい次のページのURLを書いてください
+	    window.location.href = 'nextpage.html'; 
+	  }
+	});
+  </script>
+  
+  
+</body>
+</html>

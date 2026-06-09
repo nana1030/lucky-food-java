@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>占いチャットボット</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Zen+Kurenaido&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/chatbot.css">
+</head>
+
+<body>
+
+  <div class="chat-wrapper">
+
+    <div class="greeting">
+      <p>こんにちは、わたしがあなたの道しるべになります。</p>
+      <p>どんなご相談でも、心を込めてお手伝いしますね。</p>
+    </div>
+
+    <div class="input-area">
+      <input type="text" id="userInput" class="chat-input" placeholder="ご相談をどうぞ...">
+      <button class="send-btn" id="sendBtn">送信</button>
+    </div>
+
+  </div>
+
+  <button class="back-btn" onclick="window.location.href='element.html'">
+    ← 戻る
+  </button>
+  
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 💡 キャッシュ対策：URLの末尾に時間を付けて、常に最新の音源を読み込ませます
+    const cacheBuster = '?v=' + new Date().getTime();
+    const audioPath = '/mp3/seimei_music.mp3' + cacheBuster;
+    
+    // 音声オブジェクトを作成し、BGMとしてループ再生を有効にする
+    const audio = new Audio(audioPath);
+    audio.loop = true;
+
+    console.log('chatbot.html が開かれました。BGMの自動再生を試みます...');
+
+    // 1. 画面が開いた瞬間に再生を実行
+    audio.play()
+      .then(() => {
+        console.log('チャットボット画面でのBGM自動再生に成功しました！');
+      })
+      .catch(error => {
+        // 2. ブラウザの制限（自動再生ポリシー）でブロックされた場合のバックアップ処理
+        console.log('ブラウザの制限により自動再生がブロックされました。ユーザーの操作を待ちます。');
+        
+        // チャット画面のどこかを1回でもクリック（またはタップ）したら、確実にBGMが鳴り始めるようにする
+        const playChatBGM = () => {
+          audio.play().then(() => {
+            console.log('ユーザーの操作によりチャットBGMが開始されました。');
+            // 鳴り始めたら、このクリック待ちイベントは解除する
+            document.removeEventListener('click', playChatBGM);
+          });
+        };
+        
+        document.addEventListener('click', playChatBGM);
+      });
+  });
+</script>
+
+</body>
+</html>

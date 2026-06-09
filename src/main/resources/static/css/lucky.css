@@ -1,0 +1,224 @@
+body {
+  background:
+    linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
+    url("/images/食材見つける.png") center center / cover no-repeat;
+
+  background-attachment: fixed;
+
+  color: var(--text);
+  font-family: 'Zen Kurenaido', serif;
+
+  min-height: 100vh;
+  margin: 0;
+  padding: 24px;
+}
+
+/* 全体レイアウト */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ラッキーフード（大きくした） */
+.lucky-title {
+  font-family: 'Noto Serif JP', serif;
+
+  font-size: 32px;   /* ←ここが大きさ */
+  font-weight: 600;
+
+  color: #fff;
+  text-align: center;
+
+  margin-top: 40px;
+  margin-bottom: 20px;
+
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.8),
+    0 0 20px rgba(255,255,200,0.6),
+    0 0 40px rgba(255,255,150,0.4);
+}
+
+/* カード */
+.card {
+  width: 100%;
+  max-width: 400px;
+  margin: 20px 0;
+}
+
+/* もう一度診断するボタン */
+.back-btn {
+  text-align: center;
+  position: fixed;
+  bottom: 5%;
+  left: 30%;
+  max-width: 70%;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #ffffff, #fff8dc);
+  border: 2px solid gold;
+  border-radius: 12px;
+  color: #b8860b;
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow:
+    0 0 10px rgba(255, 215, 0, 0.4),
+    0 0 20px rgba(255, 255, 200, 0.3);
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  transform: translateX(0) scale(1.05);
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 255, 200, 0.5);
+}
+
+
+/* もう一度診断するボタン2 */
+.back-btn2 {
+	text-align: center;
+	max-width: 70%;
+    position: fixed;
+    bottom: 5%;
+    right: 30%;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #ffffff, #ffdce5);
+    border: 2px solid #ff00a0;
+    border-radius: 12px;
+    color: #b80b0b;
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4), 0 0 20px rgba(255, 255, 200, 0.3);
+    transition: 0.3s;
+}
+
+.back-btn2:hover {
+  transform: translateX(0) scale(1.05);
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 255, 200, 0.5);
+}
+
+
+.center-image {
+  width: 180px;
+  display: none;
+  margin: 20px auto;
+  animation: pop 0.8s ease;
+}
+
+.food_all {
+     display: flex;       /* 横並びにする */
+     gap: 60px;           /* 画像同士の隙間を空ける */
+     margin: 80px 0 -38px 0;
+ }
+ 
+ .food_all img {
+     width: 300px;        /* ここで横幅を指定（pxは自由に変えてください） */
+     height: auto;        /* 縦横比を崩さず自動調整 */
+     border: 1px solid #ccc; /* （任意）枠線をつける場合 */
+ }
+ 
+ /* ここの部分はjsでふわっと動くようなjs */
+ 
+  /* 🌟 各画像の初期状態：透明＆少し下に下げておく（重ねない） */
+.food-item img {
+    opacity: 0;
+    transform: translateY(20px); /* 20pxだけ下に下げておく */
+    transition: opacity 1.0s ease, transform 1.0s ease;
+    max-width: 200px; /* サイズはお好みで調整してください */
+    height: auto;
+}
+
+/* 🌟 JSでこのクラスがついたら、本来の場所へフワッと現れる */
+.food-item img.show {
+    opacity: 1;
+    transform: translateY(0); /* 本来の位置に浮き上がる */
+}
+
+/* 🌟 3枚が綺麗に横に並ぶための設定 */
+.food_all {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px; /* 画像と画像の間隔 */
+    margin-top: 20px;
+}
+  
+  /* ─── フードエリア（レスポンシブ） ─── */
+.food_all {
+    display: flex;
+    flex-wrap: wrap;       /* スマホで溢れたら自動で折り返す */
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.food-item {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.food-item img {
+    max-width: 100%;       /* 画像が画面からはみ出るのを防ぐ（超重要） */
+    height: auto;          /* 縦横比を維持 */
+}
+
+/* ─── ボタンエリア（選択できない問題を解決） ─── */
+.food_box {
+    position: relative;    /* 階層をコントロールできるようにする */
+    z-index: 10;           /* 他の要素より手前に表示させてクリック可能にする */
+    display: flex;
+    flex-direction: column;/* スマホではボタンを縦並びに */
+    gap: 15px;
+    align-items: center;
+    width: 100%;
+    margin-top: 30px;
+    clear: both;           /* 万が一の回り込みを解除 */
+}
+ 
+ 
+ /* 768px以下のときに適用されるスタイル */
+ @media (max-width: 1200px){
+ 
+		.lucky-title {
+		     font-size :28px;
+		 }
+		 
+ 
+	    .food_all {
+		     display: block;       /* 横並びにする */
+		     text-align: center;
+		  }
+	  
+		.food_all img {
+			margin: 0 0 20px 0;
+		}
+		
+		body {
+			min-height: 200vh;
+		}
+		
+		.back-btn {
+	        position: relative;
+	        left: 0;
+	        max-width: 80%;
+		}
+		
+		.back-btn2 {
+		    position: relative;
+		    right: 0;
+		    max-width: 80%;
+		    padding: 14px 42px;
+		}
+
+ }
+ 
+
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}

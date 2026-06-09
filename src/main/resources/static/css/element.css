@@ -1,0 +1,298 @@
+
+
+/* ===== 全体の背景と配置 ===== */
+body {
+  background:
+    linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
+    url("/images/相性占い.PNG") center center / cover no-repeat;
+  background-attachment: fixed;
+  position: relative;
+  overflow-x : hidden;
+  overflow-y : hidden;
+}
+
+
+.moon_please img {
+	max-width: 60px;
+}
+
+/* 月の画像が丸く切り抜かれている前提 */
+.moon_please {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  right: 0;
+}
+
+/* 回転アニメーションの定義 */
+@keyframes rotateMoon {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* アニメーションを適用するクラス */
+.spinning {
+  animation: rotateMoon 10s linear infinite; /* 10秒で1周、等速、無限ループ */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.moon_mini_text {
+	text-align: center;
+	font-weight: bold;
+	color: #fff;
+	font-size: 14px;
+	margin : -10px 0 0 0;
+	text-shadow: rgba(0, 0, 0, 0.9) 0px 0px 4px, rgb(38, 29, 13) 0px 0px 8px, rgba(148, 122, 71, 0.6) 0px 0px 12px;
+}
+
+h1 {
+  font-size: 48px;
+  text-shadow: 0 0 10px rgba(255,255,255,0.8);
+}
+
+.sub-title {
+  font-size: 42px;
+  color: white;
+  margin-bottom: 30px;
+  text-align: center;
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.8),
+    0 0 20px rgba(255,255,200,0.4);
+  animation: fadeUp 1s ease forwards;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== キャラクター画像エリア ===== */
+.characters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  animation: fadeUp 1.2s ease forwards;
+}
+
+.character-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.character-box img {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  border-radius: 16px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.5),
+    0 0 40px rgba(255, 255, 200, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(2px);
+  padding: 10px;
+}
+
+.chara-label {
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.heart-label {
+  font-size: 40px;
+  color: #ffd700;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+  margin-bottom: 30px;
+}
+
+/* ===== もう一度診断するボタン（左上固定） ===== */
+.retry-btn {
+  position: fixed;
+  top: 30px;
+  left: 30px;
+  z-index: 100;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #ffffff, #fff8dc);
+  border: 2px solid gold;
+  border-radius: 12px;
+  color: #b8860b;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow:
+    0 0 10px rgba(255, 215, 0, 0.4),
+    0 0 20px rgba(255, 255, 200, 0.3);
+  transition: 0.3s;
+}
+
+.retry-btn:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 255, 200, 0.5);
+}
+
+/* ===== チャットボットに相談するボタン（深みのあるオリーブハニーウッド） ===== */
+.chatbot-btn {
+	text-decoration: none !important;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  width: 110px;
+  height: 180px; 
+  padding: 0;
+  border-radius: 55px 55px 6px 6px;
+
+  /* ★白さを完全に排除し、深いオリーブブラウンとキャラメルゴールドの木目に変更 */
+  background: 
+    /* 1層目：木目の立体感を出すための、濃いハニーブラウンの縦筋 */
+    linear-gradient(90deg, 
+      rgba(94, 76, 43, 0.4) 0%, 
+      transparent 20%, 
+      rgba(79, 62, 32, 0.45) 45%, 
+      transparent 70%, 
+      rgba(94, 76, 43, 0.35) 85%, 
+      transparent 100%
+    ),
+    /* 2層目：魔術学校のアンティーク家具のような、艶と深みのあるグラデーション */
+    linear-gradient(180deg, #c4a466 0%, #94743c 50%, #59431d 100%);
+
+  background-size: 100% 100%;
+  border: 3px solid #7a6133; /* 枠線も濃いめのオリーブゴールドにして引き締め */
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  
+  /* 内側の白い発光を消し、高級感のある重厚な影に */
+  box-shadow:
+    inset 0 0 15px rgba(61, 48, 25, 0.5), 
+    inset 0 -8px 20px rgba(43, 34, 17, 0.4),
+    0 10px 25px rgba(0,0,0,0.3),
+    0 0 15px rgba(184, 151, 88, 0.4);
+}
+
+/* ホバー演出 */
+.chatbot-btn:hover {
+  transform: translateX(-50%) translateY(-5px);
+  box-shadow:
+    inset 0 0 15px rgba(61, 48, 25, 0.6),
+    inset 0 -8px 20px rgba(43, 34, 17, 0.4),
+    0 15px 30px rgba(0,0,0,0.35),
+    0 0 25px rgba(184, 151, 88, 0.6);
+}
+
+/* 扉の内枠（白を排除し、ゴールドベージュのラインに） */
+.chatbot-btn::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 10px;
+  right: 10px;
+  bottom: 12px;
+  border-radius: 45px 45px 4px 4px;
+  border: 2px solid rgba(148, 122, 71, 0.6);
+  background: linear-gradient(180deg, rgba(224, 198, 141, 0.2), rgba(79, 62, 32, 0.15));
+}
+
+/* ドアノブ（アンティークゴールド） */
+.chatbot-btn::after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  right: 18px;
+  top: 45%; 
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff0c7, #cca041, #735515);
+  box-shadow:
+    0 0 6px rgba(196, 164, 102, 0.8),
+    0 2px 4px rgba(43, 34, 17, 0.5);
+}
+
+/* ドアの文字（気品ある金色の文字風に） */
+.chatbot-btn span {
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  text-align: center;
+  font-family: "Hiragino Maru Gothic ProN", "ヒラギノ丸ゴ", "Yu Gothic", "游ゴシック", "Comic Sans MS", sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0em;
+  line-height: 1.5;
+  color: #faeec8; 
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.9),
+    0 0 8px rgba(38, 29, 13, 1),
+    0 0 12px rgba(148, 122, 71, 0.6);
+  z-index: 10;
+}
+
+/* 768px以下のときに適用されるスタイル */
+ @media (max-width: 768px) {
+ 
+	 body {
+	    overflow-x: auto;
+	    overflow-y: auto;
+	}
+	
+	.sub-title {
+    	    font-size: 32px;
+	}
+ 
+  	.characters {
+  		display: block;
+  	}
+  	
+  	.heart-label {
+  		text-align :center;
+  	}
+  	
+  	.container {
+  		height: 180vh;
+  		margin : 0 0 180px 0;
+  	}
+  	
+  	.retry-btn {
+  		position: absolute;
+  	}
+  	
+  	.chatbot-btn{
+  		position: absolute;
+  		bottom: -30px;
+  	}
+  	
+  	
+   
+	  
+ }
+

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>診断結果</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400&family=Zen+Kurenaido&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/css/result.css">
+
+  <script src="/js/result.js" defer></script>
+</head>
+
+<body>
+
+  <div id="leaves-container" style="pointer-events:none; position:fixed; inset:0; z-index:0;"></div>
+
+  <div class="container">
+
+
+    <h1 class="main-title">診断結果</h1>
+
+    <div class="card" id="resultArea">
+      <!-- result.jsが中身を書き込む -->
+    </div>
+
+    <!--<button class="back-btn" onclick="window.location.href='/lucky'">
+      <span>そんなあなたのラッキーフードは・・・</span>
+    </button>-->
+    
+    <div style="margin-top: 20px; text-align: center;">
+	    <button class="back-btn" type="button" onclick="goToLuckyPage()"><span>そんなあなたのラッキーフードは・・・</span></button>
+	</div>
+
+  </div>
+  
+  <script>
+	  function goToLuckyPage() {
+		    // 💡 1. 画面のクラスから「木」「火」「土」などの文字を取得
+		    const resultTag = document.querySelector('.result-element');
+		    let finalElement = "木"; // 見つからなかった場合の安全な初期値
+		    
+		    if (resultTag && resultTag.textContent) {
+		        // 文字列から「木火土金水」の1文字だけを綺麗に抜き出す
+		        const match = resultTag.textContent.trim().match(/[木火土金水]/);
+		        if (match) {
+		            finalElement = match[0];
+		        }
+		    }
+		    
+		    // 💡 2. 【ここが超重要】ブラウザの秘密のメモ帳に、五行の文字をこっそり保存する！
+		    sessionStorage.setItem('myElement', finalElement);
+		    console.log("★ブラウザの記憶に五行を保存しました➔", finalElement);
+		    
+		    // 💡 3. 今までと全く同じURLの形で、ラッキーフード画面へジャンプ
+		    window.location.href = '/lucky-food?element=' + encodeURIComponent(finalElement);
+		}
+	</script>
+	
+	<script>
+		  document.addEventListener('DOMContentLoaded', () => {
+		    // 💡 キャッシュ対策：URLの末尾にランダムな数値を付けて、常に「最新のファイル」を読み込ませます
+		    const cacheBuster = '?v=' + new Date().getTime();
+		    const audioPath = '/mp3/water.mp3' + cacheBuster;
+		    
+		    // 音声オブジェクトを作成し、ループ再生を有効にする
+		    const audio = new Audio(audioPath);
+		    audio.loop = true;
+		
+		    console.log('index.html が開かれました。最新の BGM 再生を試みます...');
+		
+		    // 1. 画面が開いた瞬間に再生を実行
+		    audio.play()
+		      .then(() => {
+		        console.log('BGMの自動再生に成功しました！');
+		      })
+		      .catch(error => {
+		        // 2. ブラウザの制限（自動再生ポリシー）でブロックされた場合のバックアップ
+		        console.log('ブラウザの制限により自動再生がブロックされました。クリックを待ちます。');
+		        
+		        // 画面のどこかを1回でもクリックしたら、確実に音が鳴り始めるようにする
+		        const playBGM = () => {
+		          audio.play().then(() => {
+		            console.log('ユーザーの操作によりBGMが開始されました。');
+		            document.removeEventListener('click', playBGM);
+		          });
+		        };
+		        
+		        document.addEventListener('click', playBGM);
+		      });
+		  });
+	</script>
+
+</body>
+</html>

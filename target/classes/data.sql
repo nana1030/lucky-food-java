@@ -1,0 +1,2 @@
+INSERT INTO kanshi_master (id, kanshi_code, kanshi_name, yomi, element_group, personality_trait, strengths, weaknesses) VALUES 
+(1, 'KOSHI', '甲子', 'きのえね', '木', 'まっすぐで正義感が強く、何事も1番を目指すリーダー気質。', '行動力と開拓精神にあふれ、新しい環境でも道を切り開く。', '少し頑固で、人に指図されるのを嫌うプライドの高さもあります。');
