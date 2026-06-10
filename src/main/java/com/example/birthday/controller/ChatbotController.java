@@ -48,7 +48,7 @@ public class ChatbotController {
             
             // 4. API呼び出し（gpt-4o を指定）
             var options = OpenAiChatOptions.builder()
-                    .withModel("gpt-4o")
+                    .withModel("gpt-4o-mini")
                     .build();
             
             // プロンプトを構築して呼び出し
