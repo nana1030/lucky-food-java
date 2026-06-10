@@ -1,50 +1,51 @@
 package com.example.birthday.controller;
 
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.ai.openai.OpenAiChatModel; // 追加
-import org.springframework.beans.factory.annotation.Autowired; // 追加
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/lucky")
 public class ChatbotController {
 
-    // Spring AIが application.properties の設定（APIキーやモデル名）を自動で読み込んでくれます
-    @Autowired
-    private OpenAiChatModel chatModel;
+    private final ChatModel chatModel;
 
-    @GetMapping("/chatbot")
-    public String showChatbot(Model model) {
+    public ChatbotController(ChatModel chatModel) {
+        this.chatModel = chatModel;
+    }
+
+    @GetMapping("/chat")
+    public String showChat(HttpSession session, Model model) {
+        model.addAttribute("chatHistory", session.getAttribute("chatHistory"));
         return "chatbot";
     }
 
     @PostMapping("/chat")
-    public String chat(@RequestParam String message, Model model) {
-        // 1. 本物のChatGPT（gpt-4o）にユーザーのメッセージを送信して、返答を受け取る
-        // 🔮 占い師っぽく答えてもらうために、プロンプトを少し工夫します
-        String systemPrompt = "あなたは優秀な占い師です。親身になって、これからの道しるべとなるアドバイスを優しく、少し神秘的なトーンで回答してください。\n相談内容：";
-        String aiResponse = chatModel.call(systemPrompt + message);
+    public String chat(@RequestParam String message, HttpSession session, Model model) {
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> history = (List<Map<String, String>>) session.getAttribute("chatHistory");
+        if (history == null) history = new ArrayList<>();
 
-        // 2. 画面のThymeleaf（th:each）の順番に合わせて履歴を作成
-        List<Map<String, String>> history = new ArrayList<>();
-        
-        // ユーザーの入力を先に（画面の上側）
         history.add(Map.of("role", "user", "content", message));
-        
-        // 占い師（AI）の返答を後に（画面の下側）
-        history.add(Map.of("role", "assistant", "content", aiResponse));
 
-        // 3. 画面にデータを渡す
+        try {
+            // プロンプトを実行（モデル名などは application.properties が適用されます）
+            String response = chatModel.call(message);
+            history.add(Map.of("role", "assistant", "content", response));
+        } catch (Exception e) {
+            // 認証エラー等が発生しても、アプリは落とさずメッセージを表示
+            history.add(Map.of("role", "assistant", "content", "すみません、星の配置が読めませんでした。もう一度試してみてください。"));
+            e.printStackTrace(); // ログには詳細が出る
+        }
+
+        session.setAttribute("chatHistory", history);
         model.addAttribute("chatHistory", history);
-        
         return "chatbot";
     }
 }
