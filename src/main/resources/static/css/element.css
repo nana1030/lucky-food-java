@@ -2,15 +2,34 @@
 
 /* ===== 全体の背景と配置 ===== */
 body {
-  background:
-    linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
-    url("/images/相性占い.PNG") center center / cover no-repeat;
-  background-attachment: fixed;
+  /* 背景画像を消して、コンテンツのスタイルのみにする */
+  margin: 0;
+  padding: 0;
+  color: var(--text);
+  font-family: 'Zen Kurenaido', serif;
+  min-height: 100vh;
   position: relative;
-  overflow-x : hidden;
-  overflow-y : hidden;
+  /* スクロールを制御する場合、ここではなく別のコンテナで行うのが安全です */
+  overflow-x: hidden;
 }
 
+/* 擬似要素で背景を固定 */
+body::before {
+  content: "";
+  position: fixed; /* これがスマホで最も安定する固定方法 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh; /* アドレスバーの変化に対応させるなら 100dvh がおすすめ */
+  
+  /* 背景画像と暗いオーバーレイを合成 */
+  background: 
+    linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
+    url("/images/相性占い.PNG") center center / cover no-repeat;
+  
+  z-index: -1; /* コンテンツの背面に配置 */
+  pointer-events: none; /* タップ操作を透過させる */
+}
 
 .moon_please img {
 	max-width: 60px;

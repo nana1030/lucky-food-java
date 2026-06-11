@@ -1,16 +1,28 @@
 body {
-  background:
-    linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
-    url("/images/食材見つける.png") center center / cover no-repeat;
+    /* グラデーションをベースに */
+    background: radial-gradient(circle at top, #0d1b1e, #05070a 60%, #020304);
+    color: var(--text);
+    font-family: 'Zen Kurenaido', serif;
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px;
+    position: relative; /* 擬似要素の基準点 */
+}
 
-  background-attachment: fixed;
-
-  color: var(--text);
-  font-family: 'Zen Kurenaido', serif;
-
-  min-height: 100vh;
-  margin: 0;
-  padding: 24px;
+/* 擬似要素で背景画像を表示する（これが最もスマホで安定します） */
+body::before {
+    content: "";
+    position: fixed; /* これで背景を固定 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/images/食材見つける.png");
+    background-size: cover;
+    background-position: center;
+    z-index: -1; /* コンテンツの背面に配置 */
+    /* 不要なスクロール負荷を避ける */
+    will-change: transform; 
 }
 
 /* 全体レイアウト */
