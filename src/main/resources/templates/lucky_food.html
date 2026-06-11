@@ -42,14 +42,24 @@
             あなたと相性抜群な人は・・・
         </button>
         
-        <button class="back-btn2" onclick="window.location.href='lunch.html'">
-            近くのごはん屋さんを探す
-        </button>
+        <button class="back-btn2" th:onclick="goToLunchWithElement([[${elementName}]])">
+		    近くのごはん屋さんを探す
+		</button>
+		
     </div>
 
 </div>
 
-
+<script>
+    // 引数 element を受け取るように変更
+    function goToLunchWithElement(element) {
+        // パラメータが正しく渡っているか確認
+        console.log("選択された五行:", element);
+        
+        // URLにパラメータを付与して遷移
+        window.location.href = `lunch.html?element=${encodeURIComponent(element)}`;
+    }
+</script>
   
  <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', () => {

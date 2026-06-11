@@ -57,66 +57,79 @@
         <p class="lunch_text">ボタンを押すと、今いる場所の周辺にあるお店を提案します。</p>
         <button onclick="getNearbyGourmet()">現在地から探す</button>
 
-        <div id="result"></div>
+        <div id="result">検索中...</div>
     </div>
 
     <script>
-    function getNearbyGourmet() {
-        if (!navigator.geolocation) {
-            alert("お使いのブラウザは位置情報に対応していません。");
-            return;
-        }
 
-        document.getElementById("result").innerHTML = "<p>⏳ 位置情報を取得中...</p>";
+	    window.onload = function() {
+	        // ページ読み込み時に自動で検索を開始する
+	        getNearbyGourmet();
+	    };
+	
+	    function getNearbyGourmet() {
+	        if (!navigator.geolocation) {
+	            alert("お使いのブラウザは位置情報に対応していません。");
+	            return;
+	        }
+	
+	        // URLから「五行パラメータ」を取得
+	        const params = new URLSearchParams(window.location.search);
+	        const element = params.get('element') || ""; // 指定がなければ空文字
+	
+	        document.getElementById("result").innerHTML = "<p>⏳ 位置情報と運気を取得中...</p>";
+	
+	        navigator.geolocation.getCurrentPosition(
+	            (position) => {
+	                const lat = position.coords.latitude;
+	                const lng = position.coords.longitude;
+	
+	                document.getElementById("result").innerHTML = `<p>🔍 ${element}の運気に合うお店を検索中...</p>`;
+	
+	                // Javaへ緯度・経度と「五行」を送信
+	                // URLに &element=${element} を追加
+	                fetch(`/api/gourmet?lat=${lat}&lng=${lng}&element=${encodeURIComponent(element)}`)
+	                    .then(response => response.json())
+	                    .then(data => {
+	                        displayShops(data);
+	                    })
+	                    .catch(error => {
+	                        console.error("エラー:", error);
+	                        document.getElementById("result").innerHTML = "<p>❌ 検索中にエラーが発生しました。</p>";
+	                    });
+	            },
+	            (error) => {
+	                alert("位置情報の取得に失敗しました。");
+	                document.getElementById("result").innerHTML = "";
+	            }
+	        );
+	    }
+	
+	    // 画面にお店の一覧を表示する処理（変更なし）
+	    function displayShops(data) {
+	        const resultDiv = document.getElementById("result");
+	        resultDiv.innerHTML = "";
+	
+	        // data.results.shop が存在するか確認
+	        const shops = data.results?.shop; 
+	
+	        if (!shops || shops.length === 0) {
+	            resultDiv.innerHTML = "<p>近くにお店が見つかりませんでした。</p>";
+	            return;
+	        }
+	
+	        shops.forEach(shop => {
+	            const shopHtml = `
+	                <div class="shop" style="margin-bottom: 20px; border-bottom: 1px solid #ccc;">
+	                    <h3><a href="${shop.urls.pc}" target="_blank"> ${shop.name}</a></h3>
+	                    <p><strong>ジャンル:</strong> ${shop.genre.name} / <strong>予算:</strong> ${shop.budget.name}</p>
+	                    <p><strong>住所:</strong> ${shop.address}</p>
+	                </div>
+	            `;
+	            resultDiv.insertAdjacentHTML('beforeend', shopHtml);
+	        });
+	    }
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-
-                document.getElementById("result").innerHTML = "<p>🔍 周辺のお店を検索中...</p>";
-
-                // Javaのコントローラーへ緯度・経度を送信
-                fetch(`/api/gourmet?lat=${lat}&lng=${lng}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        displayShops(data);
-                    })
-                    .catch(error => {
-                        console.error("エラー:", error);
-                        document.getElementById("result").innerHTML = "<p>❌ 検索中にエラーが発生しました。</p>";
-                    });
-            },
-            (error) => {
-                alert("位置情報の取得に失敗しました。ブラウザの位置情報許可を確認してください。");
-                document.getElementById("result").innerHTML = "";
-            }
-        );
-    }
-
-    // 画面にお店の一覧を表示する処理
-    function displayShops(data) {
-        const resultDiv = document.getElementById("result");
-        resultDiv.innerHTML = "";
-
-        const shops = data.results.shop;
-
-        if (!shops || shops.length === 0) {
-            resultDiv.innerHTML = "<p>近くにお店が見つかりませんでした。</p>";
-            return;
-        }
-
-        shops.forEach(shop => {
-            const shopHtml = `
-                <div class="shop">
-                    <h3><a href="${shop.urls.pc}" target="_blank"> ${shop.name}</a></h3>
-                    <p><strong>ジャンル:</strong> ${shop.genre.name} / <strong>予算:</strong> ${shop.budget.name}</p>
-                    <p><strong>住所:</strong> ${shop.address}</p>
-                </div>
-            `;
-            resultDiv.insertAdjacentHTML('beforeend', shopHtml);
-        });
-    }
-    </script>
+</script>
 </body>
 </html>
